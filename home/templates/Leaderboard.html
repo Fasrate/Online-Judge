@@ -1,0 +1,24 @@
+{% extends 'base.html'%}
+
+{% block content%}
+<table class="table" class="table-responsive">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Probid</th>
+        <th scope="col">Verdict</th>
+        <th scope="col">Submittedat</th>
+      </tr>
+    </thead>
+    <tbody>
+        {%for solution in solutions%}
+        <tr>
+            <td>{{solution.probid}}</td>
+            <td>{{solution.verdict}}</td>
+            <td>{{solution.submittedat}}</td>
+        </tr>
+        {% endfor %} 
+    </tbody>
+  </table>
+   
+{%endblock%}
+
