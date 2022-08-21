@@ -34,7 +34,7 @@ def submit(request,probid):
         verdict=check(request,probid)
         language=request.POST.get('language')
         user=request.POST.get('user')
-        db=Solution(probid=probid,verdict=verdict,user=request.user)
+        db=Solution(probid=probid,verdict=verdict)
         db.save()
 
     return redirect('leaderboard')
@@ -49,8 +49,6 @@ def check(request,probid):
     fcode=open('Code.c', 'w') 
     fcode.write(code)
     
-    foutput=open('Output.txt', 'w')
-    foutput.write(output)
     finput=open('Input.txt', 'w')
     finput.write(input)
    
@@ -70,7 +68,7 @@ def check(request,probid):
 
     fcode.close()
     finput.close()
-    foutput.close()
+
 
     os.chdir('..')
 
