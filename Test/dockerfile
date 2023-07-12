@@ -1,0 +1,7 @@
+FROM gcc:4.9
+
+COPY . /myapp
+WORKDIR /myapp
+
+RUN gcc -o a Code.c
+RUN  ./a < Input.txt > Useroutput.txt
