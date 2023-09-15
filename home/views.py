@@ -4,6 +4,7 @@ from .models import Problem,Solution,TestCase
 from django.core.files import File
 import subprocess,os,sys
 from django.contrib.auth.decorators import login_required
+import time
 
 def problemset(request):
     context={
@@ -55,19 +56,21 @@ def check(request,probid):
     finput.close()
    
     # creates image from dockerfile
-    docker_build_command = 'docker build -t myapp -f  C:/Users/amanj/OneDrive/Desktop/Online-Judge-main/Online-Judge-main/Test/dockerfile .'
-    subprocess.run(docker_build_command, shell=True)
+    docker_build_command = 'docker build -t myapp -f  dockerfile .'
+    subprocess.run(docker_build_command, shell=True, timeout=60)
 
     # runs a container for above created image 
 
-    
+    ans=""
     try:
-        docker_run_command = f'docker run --name dockercontainer --timeout 10 myapp'
-        subprocess.run(docker_run_command, capture_output=True,text =True)
+        start_time = time.time()
+        s = subprocess.run(['docker', 'run', '--name', 'dockercontainer', 'myapp'], check=True, timeout=60)
+        
 
         # copy output file from docker container to outside
-        docker_cp_command = 'docker cp dockercontainer:/myapp/Useroutput.txt C:/Users/amanj/OneDrive/Desktop/Online-Judge-main/Online-Judge-main/Test/Useroutput.txt'
-        subprocess.Popen(docker_cp_command, shell=True)
+        docker_cp_command = 'docker cp dockercontainer:/myapp/Useroutput.txt Useroutput.txt'
+        result = subprocess.run(docker_cp_command, shell=True, timeout=10)
+
 
         fuseroutput = open('Useroutput.txt', 'r', encoding='utf-8')
         useroutput = fuseroutput.read()
@@ -78,24 +81,27 @@ def check(request,probid):
         finput.close()
 
 
-        os.chdir('..')
-
-        # if(s.returncode!=0):
-        #     return "CE"
+        
         print(output)
         print(useroutput)
-
-        if(useroutput.strip()!=output.strip()):
-            return "WA"
-        
-
-        return "AC"
+        print(s)
+        if(s.returncode==0):
+            ans= "TLE"
+        elif(useroutput.strip()!=output.strip()):
+            ans="WA"
+        else:
+            ans="AC"
     
-    except subprocess.CalledProcessError as e:
-        return "CE"
+    except Exception as e:
+        print("woops!")
+        ans= "CE"
     
+    finally:
+        subprocess.run(["docker", "rm", 'dockercontainer'], check=True)
+        os.chdir('..')
     
-    # Not able to handle TLE case
+        return ans
+  
 
     
         
