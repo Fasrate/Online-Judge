@@ -55,7 +55,7 @@ def check(request,probid):
     finput.write(input)
     finput.close()
    
-    print("yo")
+   
     # creates image from dockerfile
     docker_build_command = 'docker build -t myapp -f  dockerfile .'
     subprocess.run(docker_build_command, shell=True)
