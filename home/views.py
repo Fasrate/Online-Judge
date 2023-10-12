@@ -41,6 +41,7 @@ def submit(request,probid):
 
 
 def check(request,probid):
+
     os.chdir('Test')
     input=TestCase.objects.get(probid=probid).input
     output=TestCase.objects.get(probid=probid).output
@@ -54,20 +55,21 @@ def check(request,probid):
     finput.write(input)
     finput.close()
    
+    print("yo")
     # creates image from dockerfile
-    docker_build_command = 'docker build -t myapp -f  C:/Users/amanj/OneDrive/Desktop/Online-Judge-main/Online-Judge-main/Test/dockerfile .'
+    docker_build_command = 'docker build -t myapp -f  dockerfile .'
     subprocess.run(docker_build_command, shell=True)
 
     # runs a container for above created image 
 
     
     try:
-        docker_run_command = f'docker run --name dockercontainer --timeout 10 myapp'
+        docker_run_command = f'docker run --name dockercontainer myapp'
         subprocess.run(docker_run_command, capture_output=True,text =True)
 
         # copy output file from docker container to outside
-        docker_cp_command = 'docker cp dockercontainer:/myapp/Useroutput.txt C:/Users/amanj/OneDrive/Desktop/Online-Judge-main/Online-Judge-main/Test/Useroutput.txt'
-        subprocess.Popen(docker_cp_command, shell=True)
+        docker_cp_command = 'docker cp dockercontainer:/myapp/Useroutput.txt Useroutput.txt'
+        subprocess.run(docker_cp_command, shell=True, check=True)
 
         fuseroutput = open('Useroutput.txt', 'r', encoding='utf-8')
         useroutput = fuseroutput.read()
@@ -78,7 +80,6 @@ def check(request,probid):
         finput.close()
 
 
-        os.chdir('..')
 
         # if(s.returncode!=0):
         #     return "CE"
@@ -92,9 +93,10 @@ def check(request,probid):
         return "AC"
     
     except subprocess.CalledProcessError as e:
+
         return "CE"
     
-    
+  
     # Not able to handle TLE case
 
     
